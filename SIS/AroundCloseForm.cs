@@ -1,93 +1,52 @@
-﻿using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
+﻿using System;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
-namespace SIS
+namespace TIS
 {
     public partial class AroundCloseForm : Form
     {
-        MenuForm maniForm = null;
+        MenuForm mainForm = null;
+        Script script = new Script();
         public AroundCloseForm(Form callingForm)
         {
             InitializeComponent();
-            maniForm = callingForm as MenuForm;
+            mainForm = callingForm as MenuForm;
         }
 
         private void next()
         {
-            bool chk = false;
-            ConnectDB contxt = new ConnectDB();
-            MySqlConnection conn = new MySqlConnection();
-            conn = new MySqlConnection(contxt.context());
-            string sql = "select * from tbl_status_around WHERE tbl_status_around_close = '0' AND tbl_status_around_emp_open_id = '" + txt_emp_id.Text + "'";
-            MySqlCommand cmd = new MySqlCommand(sql, conn);
-            //MessageBox.Show(sql);
-            conn.Open();
-            MySqlDataReader reader = cmd.ExecuteReader();
-            try
+            string[] around = File.ReadAllText(script.file_around).Split('|');
+            if (txt_emp_id.Text.Trim() == around[0])
             {
-                if (reader.Read())
+                string sql = "UPDATE tbl_status_around SET tbl_status_around_close = '1' WHERE tbl_status_around_close = '0' AND tbl_status_around_emp_open_id = '" + txt_emp_id.Text + "'";
+                if (script.InsertUpdae_SQL(sql))
                 {
-                    if (!reader.IsDBNull(0))
-                    {
-                        chk = true;
-                    }
-                }
-                reader.Close();
-            }
-            catch
-            {
-                //MessageBox.Show(e.ToString());
-                MessageBox.Show("รหัสไม่ถูกต้อง");
-                txt_emp_id.Clear();
-            }
-            conn.Close();
+                    MessageBox.Show("ปิดกะเรียบร้อย", "ผลลัพธ์", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-            if (chk)
-            {
-                bool ck_job = false;
-                string sql_check_job = "SELECT * FROM tbl_income JOIN tbl_status_around ON tbl_income_around_id = tbl_status_around_id WHERE tbl_income_status_job = '0' AND tbl_status_around_emp_open_id = '" +txt_emp_id.Text+"'";
-                conn.Open();
-                cmd = new MySqlCommand(sql_check_job, conn);
-                reader = cmd.ExecuteReader();
-                if (!reader.Read())
-                {
-                    ck_job = true;
+                    ReportIncomForm ri = new ReportIncomForm(mainForm);
+                    if (mainForm.line9 == "9" || mainForm.cpoint_id == "701" || mainForm.cpoint_id == "702" || mainForm.cpoint_id == "710")
+                    {
+                        //ri.GetReport(int.Parse(around[1]), around[2], true, true, false);
+                    }
+                    else
+                    {
+                        //ri.GetReport(int.Parse(around[1]), around[2], false, true, false);
+                    }
+                    File.Delete(script.file_around);
+                    Application.Restart();
                 }
                 else
                 {
-                    MessageBox.Show("ยังปิด JOB งานไม่ครบ", "แจ้งเตือน", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                    maniForm.Enabled = true;
-                    this.Close();
+                    MessageBox.Show("Error", "แจ้งเตือน", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-                conn.Close();
-
-                if (ck_job)
-                {
-                    MySqlCommand comm = conn.CreateCommand();
-                    conn.Open();
-                    sql = "UPDATE tbl_status_around SET tbl_status_around_close = '1' WHERE tbl_status_around_close = '0' AND tbl_status_around_emp_open_id = '" + txt_emp_id.Text + "'";
-                    comm.CommandText = sql;
-                    comm.ExecuteNonQuery();
-                    MessageBox.Show("ปิดกะเรียบร้อย", "ผลลัพธ์", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    conn.Close();
-                    File.Delete(@"around.txt");
-
-                    Application.Restart();
-                }
-            }else{
-                MessageBox.Show("รหัสไม่ถูกต้อง","แจ้งเตือน", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
+            else
+            {
+                MessageBox.Show("รหัสรองผู้เปิด/ปิดกะ ต้องเป็นคนเดียวกัน หรือ รหัสไม่ถูกต้อง", "แจ้งเตือน", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 txt_emp_id.Clear();
             }
-
+            script.conn.Close();
         }
 
         private void AroundCloseForm_Load(object sender, EventArgs e)
@@ -97,7 +56,7 @@ namespace SIS
 
         private void btn_back_Click_1(object sender, EventArgs e)
         {
-            maniForm.Enabled = true;
+            //maniForm.Enabled = true;
             this.Close();
         }
 
@@ -111,21 +70,6 @@ namespace SIS
             else
             {
                 MessageBox.Show("กรุณาใส่รหัสผู้ปิดผลัด", "แจ้งเตือน", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            }
-        }
-
-        private void txt_emp_id_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter)
-            {
-                if (txt_emp_id.Text != "")
-                {
-                    next();
-                }
-                else
-                {
-                    MessageBox.Show("กรุณาใส่รหัสผู้ปิดผลัด", "แจ้งเตือน", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                }
             }
         }
 
@@ -144,10 +88,25 @@ namespace SIS
             }
         }
 
-        private void txt_emp_id_KeyPress(object sender, KeyPressEventArgs e)
+        private void txt_emp_id_KeyPress_1(object sender, KeyPressEventArgs e)
         {
             Script scriptCode = new Script();
             scriptCode.CheckNumber(e);
+        }
+
+        private void txt_emp_id_KeyDown_1(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                if (txt_emp_id.Text != "")
+                {
+                    next();
+                }
+                else
+                {
+                    MessageBox.Show("กรุณาใส่รหัสผู้ปิดผลัด", "แจ้งเตือน", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                }
+            }
         }
     }
 }

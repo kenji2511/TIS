@@ -1,15 +1,8 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
-namespace SIS
+namespace TIS
 {
     public partial class AroundForm : Form
     {
@@ -38,7 +31,7 @@ namespace SIS
             if (txt_emp_id.Text != "")
             {
                 string emp_id = null;
-                string sql = "SELECT * FROM tbl_emp WHERE tbl_emp_id = '" + txt_emp_id.Text + "' AND (tbl_emp_group_id=3 OR tbl_emp_group_id=7 OR tbl_emp_group_id=4)";
+                string sql = "SELECT * FROM tbl_emp WHERE tbl_emp_id = '" + txt_emp_id.Text + "' AND (tbl_emp_group_id=3 OR tbl_emp_group_id=7 OR tbl_emp_group_id=4 OR tbl_emp_group_id=10 OR tbl_emp_group_id=11 OR tbl_emp_group_id > 10)";
 
                 ConnectDB contxt = new ConnectDB();
                 MySqlConnection conn = new MySqlConnection();
@@ -55,7 +48,7 @@ namespace SIS
                         {
                             emp_id = reader.GetString("tbl_emp_id");
                             AroundOpenForm form = new AroundOpenForm(emp_id, mainForm,cpoint_id);
-                            form.Show();
+                            form.ShowDialog();
                             this.Close();
                         }
                     }

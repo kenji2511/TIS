@@ -8,16 +8,18 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace SIS
+namespace TIS
 {
     public partial class EmpToEditMoneyForm : Form
     {
         MenuForm mainForm = null;
+        Script script = new Script();
+
         public EmpToEditMoneyForm(Form callingForm)
         {
             InitializeComponent();
             mainForm = callingForm as MenuForm;
-            mainForm.Enabled = false;
+            //mainForm.Enabled = false;
         }
 
         private void btn_back_Click(object sender, EventArgs e)
@@ -28,50 +30,38 @@ namespace SIS
 
         private void btn_next_Click(object sender, EventArgs e)
         {
-            if (txt_emp_id.Text !="")
+            if (txt_emp_id.Text != "")
             {
-                next();
-            }
-            else
-            {
-                MessageBox.Show("กรุณานาใส่รหัสพนักงาน", "แจ้งเตือน", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                txt_emp_id.Focus();
-            }
-        }
-        private void next()
-        {
-            string sql = "SELECT * FROM tbl_income JOIN tbl_status_around ON tbl_income_around_id = tbl_status_around_id JOIN tbl_emp ON tbl_emp_id = tbl_income_emp_id WHERE tbl_income_emp_id = '" + txt_emp_id.Text + "' AND tbl_status_around_close = '0' AND tbl_income_status_job = '1' AND tbl_income_other IS NULL";
-
-            ConnectDB contxt = new ConnectDB();
-            MySqlConnection conn = new MySqlConnection();
-            conn = new MySqlConnection(contxt.context());
-            MySqlCommand cmd = new MySqlCommand(sql, conn);
-            conn.Open();
-            MySqlDataReader reader = cmd.ExecuteReader();
-            try
-            {
-                if (reader.Read())
+                if (script.GetEmpName(txt_emp_id.Text) != "ไม่พบข้อมูลพนักงาน")
                 {
-                    //MessageBox.Show("OK");
-                    EditMoneyForm editMoneyForm = new EditMoneyForm(mainForm,reader.GetString("tbl_emp_id"), reader.GetString("tbl_emp_name"),reader.GetString("tbl_income_around_id"));
-                    //EditMoneyForm editMoneyForm = new EditMoneyForm(mainForm, "", "", "");
-                    editMoneyForm.Show();
-                    this.Close();
+                    string sql = "SELECT * FROM `tbl_income` WHERE `tbl_income_status_job` <> '1' AND tbl_income_bank IS NOT NULL AND `tbl_income_emp_id` = '" + txt_emp_id.Text.Trim()+"' ORDER BY `tbl_income_id` DESC";
+                    MySqlDataReader reader = script.Select_SQL(sql);
+                    if (reader.Read())
+                    {
+                        EditMoneyForm select = new EditMoneyForm(mainForm, txt_emp_id.Text.Trim());
+                        select.ShowDialog();
+                        this.Close();
+                    }
+                    else
+                    {
+                        MessageBox.Show("ไม่พบข้อมูล อาจยังไม่ได้นำส่งรายได้ หรืออาจจะวิเคราะห์งานไปแล้ว!!","",MessageBoxButtons.OK,MessageBoxIcon.Exclamation);
+                        txt_emp_id.Clear();
+                        txt_emp_id.Focus();
+                    }
                 }
                 else
                 {
-                    MessageBox.Show("ไม่พบข้อมูล อาจจะยังไม่ได้นำส่งยอดของพนักงาน หรือปรับยอดไปแล้ว", "แจ้งเตือน", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    MessageBox.Show("รหัสพนักงานไม่ถูกต้อง!!!", "แจ้งเตือน", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     txt_emp_id.Clear();
-                    txt_emp_id.Focus();
                 }
-                reader.Close();
             }
-            catch
+            else
             {
-                //MessageBox.Show(e.ToString());
+                MessageBox.Show("กรุณาใส่รหัสพนักงาน", "แจ้งเตือน", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                txt_emp_id.Focus();
             }
-            conn.Close();
         }
+
 
         private void txt_emp_id_KeyPress(object sender, KeyPressEventArgs e)
         {
@@ -85,7 +75,7 @@ namespace SIS
             {
                 if (txt_emp_id.Text != "")
                 {
-                    next();
+                    btn_next_Click(null, null);
                 }
                 else
                 {
@@ -101,7 +91,7 @@ namespace SIS
             {
                 if (txt_emp_id.Text != "")
                 {
-                    next();
+                    btn_next_Click(null, null);
                 }
                 else
                 {
@@ -109,6 +99,11 @@ namespace SIS
                     txt_emp_id.Focus();
                 }
             }
+        }
+
+        private void EmpToEditMoneyForm_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

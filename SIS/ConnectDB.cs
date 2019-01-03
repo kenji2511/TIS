@@ -5,18 +5,19 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace SIS
+namespace TIS
 {
     class ConnectDB
     {
         public string context()
         {
-            FileInfo DirInfo = new FileInfo("conf.txt");
+            string file_con = "conf.setting";
+            FileInfo DirInfo = new FileInfo(file_con);
             string text = "";
             if (DirInfo.Exists)
             {
                 //MySqlConnection conn = new MySqlConnection();
-                text = File.ReadAllText(@"conf.txt");
+                text = File.ReadAllText(@file_con);
                 //conn = new MySqlConnection(context);
             }
             return text;

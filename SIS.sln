@@ -3,14 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2015
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIS", "SIS\SIS.csproj", "{8C82811B-197F-4A84-A4A6-9687E91D5316}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TIS", "SIS\TIS.csproj", "{8C82811B-197F-4A84-A4A6-9687E91D5316}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D4B38D7D-A447-4C56-879E-E6460E47B096}"
 	ProjectSection(SolutionItems) = preProject
 		conf.txt = conf.txt
 	EndProjectSection
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "Setup\Setup.vdproj", "{7130CCD9-CFC5-4FBF-A66E-C6E55D65BD8D}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "Setup\Setup.vdproj", "{C4375CAF-034C-48BC-8625-EAA704D92E9A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,8 +22,8 @@ Global
 		{8C82811B-197F-4A84-A4A6-9687E91D5316}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C82811B-197F-4A84-A4A6-9687E91D5316}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C82811B-197F-4A84-A4A6-9687E91D5316}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7130CCD9-CFC5-4FBF-A66E-C6E55D65BD8D}.Debug|Any CPU.ActiveCfg = Debug
-		{7130CCD9-CFC5-4FBF-A66E-C6E55D65BD8D}.Release|Any CPU.ActiveCfg = Release
+		{C4375CAF-034C-48BC-8625-EAA704D92E9A}.Debug|Any CPU.ActiveCfg = Debug
+		{C4375CAF-034C-48BC-8625-EAA704D92E9A}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

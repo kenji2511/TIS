@@ -1,4 +1,5 @@
-﻿using MySql.Data.MySqlClient;
+﻿using MySql.Data;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace SIS
+namespace TIS
 {
     public partial class EmpSendMoneyForm : Form
     {
@@ -17,7 +18,7 @@ namespace SIS
         {
             InitializeComponent();
             mainForm = callingForm as MenuForm;
-            mainForm.Enabled = false;
+            //mainForm.Enabled = false;
         }
 
         private void btn_back_Click(object sender, EventArgs e)
@@ -55,7 +56,7 @@ namespace SIS
                 {
                     BackMoneyForm backMoneyForm = new BackMoneyForm(mainForm,textBox1.Text);
                     this.Close();
-                    backMoneyForm.Show();
+                    backMoneyForm.ShowDialog();
                 }
                 else
                 {
@@ -65,19 +66,19 @@ namespace SIS
 
                 if (chk_back_money)
                 {
-                    sql = "SELECT * FROM tbl_income JOIN tbl_emp ON tbl_income_emp_id = tbl_emp_id WHERE tbl_emp_id = '" + textBox1.Text + "' AND tbl_income_status_backmaney = '1' AND tbl_income_status_job = '0'";
+                    sql = "SELECT * FROM tbl_income JOIN tbl_emp ON tbl_income_emp_id = tbl_emp_id WHERE tbl_emp_id = '" + textBox1.Text + "' AND tbl_income_status_backmaney = '1' AND tbl_income_bank IS NULL";
                     cmd = new MySqlCommand(sql, conn);
                     reader = cmd.ExecuteReader();
                     if (reader.Read())
                     {
                         //MessageBox.Show("คืนเงินแล้ว");
                         SendMoneyForm sendMoneyForm = new SendMoneyForm(mainForm,textBox1.Text);
-                        sendMoneyForm.Show();
+                        sendMoneyForm.ShowDialog();
                         this.Close();
                     }
                     else
                     {
-                        MessageBox.Show("ไม่พบข้อมูล", "แจ้งเตือน", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                        MessageBox.Show("ไม่พบข้อมูล หรืออาจจะนำส่งรายได้ไปแล้ว", "แจ้งเตือน", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                         textBox1.Clear();
                         textBox1.Focus();
                     }
@@ -96,6 +97,11 @@ namespace SIS
             {
                 next();
             }
+        }
+
+        private void textBox1_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            new Script().CheckNumber(e);
         }
     }
 }
