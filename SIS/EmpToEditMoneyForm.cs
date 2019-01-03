@@ -103,7 +103,7 @@ namespace TIS
 
         private void EmpToEditMoneyForm_Load(object sender, EventArgs e)
         {
-
+            //null
         }
     }
 }
